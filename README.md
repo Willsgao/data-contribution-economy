@@ -60,6 +60,7 @@
 | [02-顶层设计体系](docs/02-architecture.md) | L0-L5六层架构 + 治理监管 + 演进路径 |
 | [03-贡献值计量详解](docs/03-contribution.md) | 双轨制算法、Shapley修正、AI增益、合成衰减 |
 | [04-风险识别与优化方向](docs/04-risks.md) | 已识别的开放问题、风险等级、初步优化方向 |
+| [05-分层实现路径](docs/05-implementation-layers.md) | 基础层→核心层→扩展层→全态层，每层做什么、不做什么、达标标准 |
 | [参考文献与竞品分析](references/reading-list.md) | 引用文献、现有方案对比 |
 
 ---
