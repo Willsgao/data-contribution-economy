@@ -6,7 +6,7 @@
 
 | 项目 | 文件 | 关系 |
 |------|------|------|
-| 绿电算力底座 | [green-electricity-park.md](green-electricity-park.md) | 为数据分配方案提供物理基础设施参考，但方案本身不依赖特定园区 |
+| 绿电算力底座 | [green-electricity-park.md](green-electricity-park.md) | 化债断供+绿色算力+跨省SPV+就业安置，已通过正规渠道提交发改委备参 |
 
 ## 核心与分支的关系
 
