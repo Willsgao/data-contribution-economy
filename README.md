@@ -72,6 +72,7 @@ python engine/simulate.py
 | [03-贡献值计量详解](docs/03-contribution.md) | 六轨制算法（劳动/市场/AI/合成/历史/资本平台）、稀缺性动态衰减、Shapley修正 |
 | [04-风险识别与优化方向](docs/04-risks.md) | 已识别的开放问题、风险等级、初步优化方向 |
 | [05-分层实现路径](docs/05-implementation-layers.md) | 基础层→核心层→扩展层→全态层，每层做什么、不做什么、达标标准 |
+| [06-价值流通模型](docs/06-economic-circulation.md) | 四层积分体系、内外经济循环、兑换权机制、数字人民币桥接、冷启动三步走 |
 | [参考文献与竞品分析](references/reading-list.md) | 引用文献、现有方案对比 |
 | [分支项目](branches/README.md) | 绿电算力底座等独立但相关的分支项目 |
 
