@@ -1,0 +1,4 @@
+node_modules/
+package-lock.json
+package.json
+gen_contest_docs.js
