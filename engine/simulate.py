@@ -21,7 +21,7 @@ import math
 
 K = 0.01                       # 稀缺性衰减系数
 PROFIT_PER_CALL = 20000        # 模型每次调用数据产生的利润 (元)
-PLATFORM_SHARE = 0.30           # 平台分成比例（轨道F：运营成本+撮合+产品化服务费）
+PLATFORM_SHARE = 0.30           # 公共服务平台扣除比例（税收+基础设施运营，归入公共财政）
 MODEL_CALLS = 5                # 模拟数据被模型调用的总次数（模拟时间轴）
 CAP_MULTIPLIER = 300           # 收入上限倍数：累计收入 > 基础贡献值 × 此倍数 → 超额入池
 TRADITIONAL_RATE = 5           # 工业时代计件单价 (元/工时)
@@ -141,7 +141,7 @@ print("  【阶段三】AI时代：持续版税 — 数据被反复调用，每�
 print(EQ)
 print()
 print(f"  规则: 终端产品每次调用数据产生 ¥{PROFIT_PER_CALL:,} 利润。")
-print(f"        平台扣除 {PLATFORM_SHARE*100:.0f}%（轨道F：运营成本+撮合+产品化）后，余额按贡献值比例分润。")
+print(f"        公共服务平台扣除 {PLATFORM_SHARE*100:.0f}%（税收+基础设施运营成本，归入公共财政）后，余额按贡献值比例持续分润。")
 print(f"        收入上限 = 基础贡献值 × {CAP_MULTIPLIER}。超出部分 → 公共基金池。")
 print()
 
@@ -181,7 +181,7 @@ for s in state:
     print(row)
 
 total_platform = round(PROFIT_PER_CALL * PLATFORM_SHARE * MODEL_CALLS, 2)
-print(f"  {'平台(轨道F)':<18} {'':>10} {'':>10} {'':>10} {'':>10} {'':>10}  ¥{total_platform:>10,.2f}  {'(运营成本+服务费)':>12}  {'':>10}")
+print(f"  {'公共服务平台(税收+运营)':<24} {'':>6} {'':>6} {'':>6} {'':>6} {'':>6}  ¥{total_platform:>10,.2f}  {'归入公共财政':>12}  {'':>10}")
 
 print(SEP)
 print()
@@ -243,13 +243,15 @@ print(SEP)
 for s in state:
     multiple = s["future_total"] / s["traditional_income"] if s["traditional_income"] > 0 else 0
     print(f"  {s['name']:<18} ¥{s['future_total']:>12,.2f}  ¥{s['future_pool']:>12,.2f}  ¥{s['traditional_income']:>12,.2f}  {multiple:>8.0f}x")
-print(f"  {'平台(轨道F)':<18} ¥{FUTURE_PLATFORM:>12,.2f}  {'(运营+撮合+产品化)':>14}  {'':>14}  {'':>10}")
+print(f"  {'公共服务平台(税收+运营)':<22} ¥{FUTURE_PLATFORM:>12,.2f}  {'归入公共财政':>14}  {'':>14}  {'':>10}")
 print(SEP)
 workers_total = sum(s["future_total"] for s in state)
 print(f"  {'公共基金池':<18} {'':>14} ¥{future_pool:>12,.2f}")
 print(f"  {'劳动者合计':<18} ¥{workers_total:>12,.2f}")
 print()
-print(f"  ★ 三方分配: 平台 ¥{FUTURE_PLATFORM:,.0f} (运营) | 劳动者 ¥{workers_total:,.0f} | 公共池 ¥{future_pool:,.0f}")
+public_total = FUTURE_PLATFORM + future_pool
+print(f"  ★ 分配结构: 公共财政(税收+运营) ¥{FUTURE_PLATFORM:,.0f} | 劳动者 ¥{workers_total:,.0f} | 公共基金池 ¥{future_pool:,.0f}")
+print(f"             平台是政府背景的公共服务基础设施，收益最终归入公共财政和全民福利。")
 print(f"  ★ 工业时代: 张医生一次拿 ¥{state[0]['traditional_income']:,.0f}，平台拿走剩余 ¥{FUTURE_TOTAL - total_traditional:,}。")
 print(f"  ★ AI时代:   张医生持续拿 ¥{state[0]['future_total']:,.0f}（{state[0]['future_total']/state[0]['traditional_income']:.0f}x），")
 print(f"             超额 ¥{state[0]['future_pool']:,.0f} 入公共池滋养全社会。")
