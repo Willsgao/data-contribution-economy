@@ -21,6 +21,7 @@ import math
 
 K = 0.01                       # 稀缺性衰减系数
 PROFIT_PER_CALL = 20000        # 模型每次调用数据产生的利润 (元)
+PLATFORM_SHARE = 0.30           # 平台分成比例（轨道F：运营成本+撮合+产品化服务费）
 MODEL_CALLS = 5                # 模拟数据被模型调用的总次数（模拟时间轴）
 CAP_MULTIPLIER = 300           # 收入上限倍数：累计收入 > 基础贡献值 × 此倍数 → 超额入池
 TRADITIONAL_RATE = 5           # 工业时代计件单价 (元/工时)
@@ -139,7 +140,8 @@ print(EQ)
 print("  【阶段三】AI时代：持续版税 — 数据被反复调用，每次都分润")
 print(EQ)
 print()
-print(f"  规则: 每个模型调用数据并产生 ¥{PROFIT_PER_CALL:,} 利润后，按贡献值比例自动分润。")
+print(f"  规则: 终端产品每次调用数据产生 ¥{PROFIT_PER_CALL:,} 利润。")
+print(f"        平台扣除 {PLATFORM_SHARE*100:.0f}%（轨道F：运营成本+撮合+产品化）后，余额按贡献值比例分润。")
 print(f"        收入上限 = 基础贡献值 × {CAP_MULTIPLIER}。超出部分 → 公共基金池。")
 print()
 
@@ -148,13 +150,16 @@ header = f"  {'':<18}" + "".join(f"  {'第'+str(i+1)+'次':>10}" for i in range(
 print(header)
 print(SEP)
 
+distributable_per_call = round(PROFIT_PER_CALL * (1 - PLATFORM_SHARE), 2)
+total_platform = 0.0
+
 for s in state:
     cumulative = 0.0
     excess = 0.0
     row = f"  {s['name']:<18}"
     for call_idx in range(MODEL_CALLS):
         share = s["contribution"] / total_contrib
-        call_profit = round(share * PROFIT_PER_CALL, 2)
+        call_profit = round(share * distributable_per_call, 2)
         # 上限检查：当前累计还没超上限，这笔收入正常入账
         available_cap = max(0, s["cap"] - cumulative)
         if call_profit <= available_cap:
@@ -174,6 +179,9 @@ for s in state:
     public_pool += excess
     row += f"  ¥{cumulative:>10,.2f}  ¥{s['cap']:>10,.2f}  ¥{excess:>8,.2f}"
     print(row)
+
+total_platform = round(PROFIT_PER_CALL * PLATFORM_SHARE * MODEL_CALLS, 2)
+print(f"  {'平台(轨道F)':<18} {'':>10} {'':>10} {'':>10} {'':>10} {'':>10}  ¥{total_platform:>10,.2f}  {'(运营成本+服务费)':>12}  {'':>10}")
 
 print(SEP)
 print()
@@ -201,7 +209,11 @@ print(EQ)
 print()
 
 FUTURE_CALLS = 50
-print(f"  模拟 {FUTURE_CALLS} 次模型调用，每次利润 ¥{PROFIT_PER_CALL:,}，总利润 ¥{FUTURE_CALLS * PROFIT_PER_CALL:,}")
+FUTURE_TOTAL = FUTURE_CALLS * PROFIT_PER_CALL
+FUTURE_PLATFORM = round(FUTURE_TOTAL * PLATFORM_SHARE, 2)
+FUTURE_DISTRIBUTABLE_PER_CALL = round(PROFIT_PER_CALL * (1 - PLATFORM_SHARE), 2)
+print(f"  模拟 {FUTURE_CALLS} 次模型调用，每次利润 ¥{PROFIT_PER_CALL:,}，总利润 ¥{FUTURE_TOTAL:,}")
+print(f"  平台扣除 {PLATFORM_SHARE*100:.0f}% (¥{FUTURE_PLATFORM:,.0f})，余额 ¥{FUTURE_TOTAL - FUTURE_PLATFORM:,.0f} 按贡献值分配")
 print()
 
 # 重置累计
@@ -213,7 +225,7 @@ future_pool = 0.0
 for call_idx in range(FUTURE_CALLS):
     for s in state:
         share = s["contribution"] / total_contrib
-        cp = round(share * PROFIT_PER_CALL, 2)
+        cp = round(share * FUTURE_DISTRIBUTABLE_PER_CALL, 2)
         available = max(0, s["cap"] - s["future_total"])
         if cp <= available:
             s["future_total"] += cp
@@ -231,10 +243,14 @@ print(SEP)
 for s in state:
     multiple = s["future_total"] / s["traditional_income"] if s["traditional_income"] > 0 else 0
     print(f"  {s['name']:<18} ¥{s['future_total']:>12,.2f}  ¥{s['future_pool']:>12,.2f}  ¥{s['traditional_income']:>12,.2f}  {multiple:>8.0f}x")
+print(f"  {'平台(轨道F)':<18} ¥{FUTURE_PLATFORM:>12,.2f}  {'(运营+撮合+产品化)':>14}  {'':>14}  {'':>10}")
 print(SEP)
+workers_total = sum(s["future_total"] for s in state)
 print(f"  {'公共基金池':<18} {'':>14} ¥{future_pool:>12,.2f}")
+print(f"  {'劳动者合计':<18} ¥{workers_total:>12,.2f}")
 print()
-print(f"  ★ 工业时代: 张医生一次拿 ¥{state[0]['traditional_income']:,.0f}，平台拿走剩余 ¥{FUTURE_CALLS*PROFIT_PER_CALL - total_traditional:,}。")
+print(f"  ★ 三方分配: 平台 ¥{FUTURE_PLATFORM:,.0f} (运营) | 劳动者 ¥{workers_total:,.0f} | 公共池 ¥{future_pool:,.0f}")
+print(f"  ★ 工业时代: 张医生一次拿 ¥{state[0]['traditional_income']:,.0f}，平台拿走剩余 ¥{FUTURE_TOTAL - total_traditional:,}。")
 print(f"  ★ AI时代:   张医生持续拿 ¥{state[0]['future_total']:,.0f}（{state[0]['future_total']/state[0]['traditional_income']:.0f}x），")
 print(f"             超额 ¥{state[0]['future_pool']:,.0f} 入公共池滋养全社会。")
 print(f"  ★ 共同富裕: 公共池积累 ¥{future_pool:,.0f}，保障罕见病患者等弱势群体，")
