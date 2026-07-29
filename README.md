@@ -4,6 +4,8 @@
 > 让区域政府分享税收利润，防止区域两极化加剧。  
 > 两件事，同一个机制。
 
+[GitHub](https://github.com/Willsgao/data-contribution-economy) | [Gitee 镜像](https://gitee.com/willsgao/data-contribution-economy)
+
 ---
 
 ## 这套方案要解决什么
